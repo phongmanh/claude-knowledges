@@ -1,0 +1,47 @@
+# ##########################################
+# 1. Gradle and Kotlin Multiplatform Build
+# ##########################################
+.gradle/
+build/
+**/build/
+!src/**/build/
+.kotlin/
+*.lock
+*yarn.lock
+
+# ##########################################
+# 2. Android and General IDE (IntelliJ / Android Studio)
+# ##########################################
+*.iml
+.idea/
+.idea.DS_Store
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.jks
+*.keystore
+
+# ##########################################
+# 3. Apple / iOS Development (Xcode & CocoaPods)
+# ##########################################
+# Ignore personal Xcode environments and build paths
+xcuserdata/
+*.xcworkspace/
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/**
+!*.xcodeproj/project.xcworkspace/**
+!*.xcworkspace/contents.xcworkspacedata/**
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+# CocoaPods specific exclusions (if using CocoaPods integration)
+.cocoapods/
+Pods/
+
+# ##########################################
+# 4. OS Generated Files
+# ##########################################
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
