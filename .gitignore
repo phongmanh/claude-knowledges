@@ -45,3 +45,9 @@ Pods/
 .DS_Store?
 ._*
 Thumbs.db
+# ##########################################
+# 5. Claude Code (personal, not shared)
+# ##########################################
+.claude/agent-memory-local/
+.claude/settings.local.json
+CLAUDE.local.md
