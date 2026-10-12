@@ -59,6 +59,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
   ---
   1. Create `<Feature>UiState` sealed interface (Loading/Success/Error) ...
   ```
+- In this repo: [`waterfall-sdlc`](.claude/skills/waterfall-sdlc/SKILL.md) — a stack-agnostic, phase-gated waterfall lifecycle (initiation → maintenance) with mobile/frontend/backend best practices and deliverable templates. Run `/waterfall-sdlc`, or ask Claude to plan or build an app or feature with waterfall.
 
 #### Subagents — `.claude/agents/`
 - A Markdown file with frontmatter (`name`, `description`, optional `tools`, `model`) and a system prompt in the body.
