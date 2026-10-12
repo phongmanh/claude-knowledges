@@ -18,6 +18,7 @@ Dependency rule: outer layers depend inward only. `domain` must never import fro
 - Domain layer rules → `@domain/CLAUDE.md`
 - Data layer rules → `@data/CLAUDE.md`
 - Cross-cutting rules (naming, git, PR process) → `@rules/naming.md`, `@rules/git.md`
+- Lifecycle for an Android + iOS app with Kotlin/Compose Multiplatform (requirements → Play and App Store release, with phase gates) → `/compose-multiplatform-sdlc` skill
 
 ## Global Rules
 - Kotlin only for new code; `val` over `var`; avoid `!!`
