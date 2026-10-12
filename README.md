@@ -46,7 +46,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
   # Domain rules
   - No android.* imports ...
   ```
-- In this repo: `GUIDELINES.md` (principles), `naming.md`, `git.md`, and one file per layer (`app/`, `domain/`, `data/`). Two rules use `paths:` so they load only when needed: `testing.md` (test sources) and `sdlc.md` (`docs/sdlc/**`, the android-sdlc deliverables).
+- In this repo: `GUIDELINES.md` (principles), `naming.md`, `git.md`, and one file per layer (`app/`, `domain/`, `data/`). Two rules use `paths:` so they load only when needed: `testing.md` (test sources, including Kotlin Multiplatform test source sets) and `sdlc.md` (`docs/sdlc/**`, the android-sdlc and compose-multiplatform-sdlc deliverables).
 
 #### Skills — `.claude/skills/`
 - A folder with a `SKILL.md` (plus optional scripts, templates, reference docs). Frontmatter `name` + `description`.
@@ -147,15 +147,15 @@ Claude Code can be customized with several kinds of files. They differ in **when
 - In this repo:
   - `block-prod-db.sh` (`PreToolUse` on `Bash`) — blocks commands that touch production/staging databases.
   - `scan-secrets.sh` (`Stop`) — scans changed files for hard-coded secrets when Claude finishes.
-  - `guard-kotlin-rules.py` (`PreToolUse` on `Edit|Write|MultiEdit`) — blocks new production Kotlin (`src/main/**/*.kt`) that breaks the project rules:
+  - `guard-kotlin-rules.py` (`PreToolUse` on `Edit|Write|MultiEdit`) — blocks new production Kotlin (`src/main/**/*.kt`, and the Kotlin Multiplatform source sets such as `src/commonMain/`, `src/androidMain/`, `src/iosMain/`) that breaks the project rules:
     - `!!`, `GlobalScope`, `runBlocking`;
     - hard-coded `Text("…")`;
-    - hard-coded `Dispatchers.IO/Default` outside a `@Provides` DI module;
-    - Android imports in the domain layer;
+    - hard-coded `Dispatchers.IO/Default` outside a DI module (Hilt `@Provides` or Koin `module { }`);
+    - Android, iOS (`platform.*`), Retrofit, OkHttp or Ktor imports in the domain layer;
     - repositories referenced in a ViewModel.
 
     Only the text being written is checked, so legacy code isn't flagged.
-  - `guard-sdlc-baseline.py` (`PreToolUse` on `Edit|Write|MultiEdit`) — before an edit to an android-sdlc deliverable that `STATUS.md` marks Approved, asks you to confirm (baselines change through a change request). `STATUS.md`, `rtm.md` and `cr/` are never gated.
+  - `guard-sdlc-baseline.py` (`PreToolUse` on `Edit|Write|MultiEdit`) — before an edit to an android-sdlc or compose-multiplatform-sdlc deliverable that `STATUS.md` marks Approved, asks you to confirm (baselines change through a change request). `STATUS.md`, `rtm.md` and `cr/` are never gated.
 - Scripts only run once registered in `.claude/settings.json` and made executable (`chmod +x`). This repo registers them like this:
   ```json
   {

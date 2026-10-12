@@ -2,9 +2,11 @@
 """Claude Code PreToolUse hook (Edit|Write|MultiEdit).
 
 Blocks new production Kotlin that breaks the project's coding and
-architecture rules (.claude/rules/, android-sdlc code patterns). Only the text
-being written is checked, so existing legacy code is never flagged.
-Exit code 2 stops the tool call and shows stderr to Claude.
+architecture rules (.claude/rules/, the android-sdlc and
+compose-multiplatform-sdlc code patterns). Production code is src/main/ and
+the Kotlin Multiplatform source sets (src/commonMain/, src/androidMain/,
+src/iosMain/, ...). Only the text being written is checked, so existing legacy
+code is never flagged. Exit code 2 stops the tool call and shows stderr to Claude.
 
 Install at: .claude/hooks/guard-kotlin-rules.py   (chmod +x)
 """
@@ -12,8 +14,13 @@ import json
 import re
 import sys
 
-RULES_HINT = ".claude/rules/ and .claude/skills/android-sdlc/reference/code-patterns.md"
+RULES_HINT = (
+    ".claude/rules/ and the code-patterns.md of .claude/skills/android-sdlc "
+    "or .claude/skills/compose-multiplatform-sdlc"
+)
 COMMENT_PREFIXES = ("//", "/*", "*")
+PRODUCTION_SOURCE = re.compile(r"/src/(main|\w+Main)/")
+DI_MODULE = re.compile(r"@Provides|\bmodule\s*\{")
 
 
 def everywhere(path, text):
@@ -29,7 +36,8 @@ def in_view_model(path, text):
 
 
 def outside_di_module(path, text):
-    return "@Provides" not in text
+    """True unless the text is a Hilt module (@Provides) or a Koin module (module { ... })."""
+    return not DI_MODULE.search(text)
 
 
 # (pattern, rule, applies_to)
@@ -37,15 +45,20 @@ CHECKS = [
     (r"[\w)\]]!!", "No `!!`: use `?.`, `?:` or `requireNotNull(x) { \"reason\" }`.", everywhere),
     (r"\bGlobalScope\b", "No `GlobalScope`: use viewModelScope, a suspend function or WorkManager.", everywhere),
     (r"\brunBlocking\b", "No `runBlocking` in production code.", everywhere),
-    (r"\bText\(\s*(text\s*=\s*)?\"", "No hard-coded UI text: use `stringResource(R.string.…)`.", everywhere),
+    (
+        r"\bText\(\s*(text\s*=\s*)?\"",
+        "No hard-coded UI text: use `stringResource(R.string.…)`, or `stringResource(Res.string.…)` in Compose Multiplatform.",
+        everywhere,
+    ),
     (
         r"\bDispatchers\.(IO|Default)\b",
-        "Inject dispatchers (`@IoDispatcher`, `@DefaultDispatcher`) instead of hard-coding them.",
+        "Inject dispatchers (`@IoDispatcher`/`@DefaultDispatcher`, or `AppDispatchers` in Kotlin Multiplatform) "
+        "instead of hard-coding them.",
         outside_di_module,
     ),
     (
-        r"^\s*import\s+(android|androidx|retrofit2|okhttp3|dagger\.hilt\.android)\.",
-        "The domain layer is pure Kotlin: no Android, Retrofit, OkHttp or Hilt-Android imports.",
+        r"^\s*import\s+(android|androidx|retrofit2|okhttp3|dagger\.hilt\.android|io\.ktor|platform)\.",
+        "The domain layer is pure Kotlin: no Android, iOS (`platform.*`), Retrofit, OkHttp, Ktor or Hilt-Android imports.",
         in_domain_layer,
     ),
     (r"\b[A-Z]\w*Repository(Impl)?\b", "ViewModels call UseCases, never repositories.", in_view_model),
@@ -77,7 +90,7 @@ def main():
         path, text = read_tool_call()
     except ValueError:
         return 0
-    if not (path.endswith(".kt") and "/src/main/" in path):
+    if not (path.endswith(".kt") and PRODUCTION_SOURCE.search(path)):
         return 0
 
     violations = find_violations(path, text)

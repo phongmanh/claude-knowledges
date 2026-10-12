@@ -4,10 +4,11 @@ paths:
 ---
 # SDLC Documents
 
-Applies to the deliverables of the android-sdlc workflow (`/android-sdlc`) under `docs/sdlc/<initiative-slug>/`.
+Applies to the deliverables of the android-sdlc (`/android-sdlc`) and compose-multiplatform-sdlc (`/compose-multiplatform-sdlc`) workflows under `docs/sdlc/<initiative-slug>/`.
 
 - **Start from `STATUS.md`.** Check the current phase, and confirm the previous gate is approved before writing a later phase's deliverable.
-- **Follow the template** in `.claude/skills/android-sdlc/templates/`, keeping its section order and tables.
+- **Follow the template** of the workflow that owns the workspace, keeping its section order and tables: `.claude/skills/compose-multiplatform-sdlc/templates/` when `STATUS.md` names that skill (an Android + iOS app), otherwise `.claude/skills/android-sdlc/templates/`.
+- **Platforms.** In a compose-multiplatform-sdlc workspace, requirements, designs and tests apply to Android and iOS unless tagged `[Android]` or `[iOS]`, and every gate is checked on both.
 - **IDs everywhere:**
   - `FR-nnn`;
   - `NFR-<ATTR>-nn`;
