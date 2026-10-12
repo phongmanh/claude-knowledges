@@ -69,6 +69,6 @@ Detailed conventions for all mobile projects (Java / Kotlin). Referenced from ro
 ## 9. Security
 
 - No secrets/API keys in source code or version control.
-- Encrypted storage for sensitive data (EncryptedSharedPreferences, Keystore).
+- Encrypted storage for sensitive data: keys in the Android Keystore (e.g. Tink), data in DataStore. `EncryptedSharedPreferences` (security-crypto) is deprecated — don't use it in new code.
 - HTTPS only; validate all input from external sources.
 - Obfuscate release builds (R8/ProGuard).

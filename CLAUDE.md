@@ -18,6 +18,9 @@ Dependency rule: outer layers depend inward only. `domain` must never import fro
 - Domain layer rules → `@domain/CLAUDE.md`
 - Data layer rules → `@data/CLAUDE.md`
 - Cross-cutting rules (naming, git, PR process) → `@rules/naming.md`, `@rules/git.md`
+- Test code conventions → `.claude/rules/testing.md` (loaded only for test sources)
+- SDLC documents under `docs/sdlc/` → `.claude/rules/sdlc.md` (loaded only for those files)
+- Enforced by hooks: Kotlin rule checks on every edit (`guard-kotlin-rules.py`), confirmation before editing a baselined SDLC document (`guard-sdlc-baseline.py`)
 
 ## Global Rules
 - Kotlin only for new code; `val` over `var`; avoid `!!`

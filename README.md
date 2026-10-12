@@ -46,7 +46,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
   # Domain rules
   - No android.* imports ...
   ```
-- In this repo: `GUIDELINES.md` (principles), `naming.md`, `git.md`, and one file per layer (`app/`, `domain/`, `data/`).
+- In this repo: `GUIDELINES.md` (principles), `naming.md`, `git.md`, and one file per layer (`app/`, `domain/`, `data/`). Two rules use `paths:` so they load only when needed: `testing.md` (test sources) and `sdlc.md` (`docs/sdlc/**`, the android-sdlc deliverables).
 
 #### Skills — `.claude/skills/`
 - A folder with a `SKILL.md` (plus optional scripts, templates, reference docs). Frontmatter `name` + `description`.
@@ -147,12 +147,25 @@ Claude Code can be customized with several kinds of files. They differ in **when
 - In this repo:
   - `block-prod-db.sh` (`PreToolUse` on `Bash`) — blocks commands that touch production/staging databases.
   - `scan-secrets.sh` (`Stop`) — scans changed files for hard-coded secrets when Claude finishes.
+  - `guard-kotlin-rules.py` (`PreToolUse` on `Edit|Write|MultiEdit`) — blocks new production Kotlin (`src/main/**/*.kt`) that breaks the project rules:
+    - `!!`, `GlobalScope`, `runBlocking`;
+    - hard-coded `Text("…")`;
+    - hard-coded `Dispatchers.IO/Default` outside a `@Provides` DI module;
+    - Android imports in the domain layer;
+    - repositories referenced in a ViewModel.
+
+    Only the text being written is checked, so legacy code isn't flagged.
+  - `guard-sdlc-baseline.py` (`PreToolUse` on `Edit|Write|MultiEdit`) — before an edit to an android-sdlc deliverable that `STATUS.md` marks Approved, asks you to confirm (baselines change through a change request). `STATUS.md`, `rtm.md` and `cr/` are never gated.
 - Scripts only run once registered in `.claude/settings.json` and made executable (`chmod +x`). This repo registers them like this:
   ```json
   {
     "hooks": {
       "PreToolUse": [
-        { "matcher": "Bash", "hooks": [{ "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-prod-db.sh" }] }
+        { "matcher": "Bash", "hooks": [{ "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-prod-db.sh" }] },
+        { "matcher": "Edit|Write|MultiEdit", "hooks": [
+          { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-kotlin-rules.py" },
+          { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-sdlc-baseline.py" }
+        ] }
       ],
       "Stop": [
         { "hooks": [{ "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/scan-secrets.sh" }] }
@@ -164,6 +177,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
 #### Settings — `settings.json`
 - Precedence (highest first): enterprise managed → command-line flags → `.claude/settings.local.json` → `.claude/settings.json` → `~/.claude/settings.json`.
 - Holds `model`, `env`, `permissions` (`allow` / `deny` / `ask` lists such as `"Bash(./gradlew test)"`), and `hooks`.
+- In this repo: `.claude/settings.json` registers the hooks above and allows the Gradle quality commands without a prompt (`assembleDebug`, `test`, `ktlintCheck`, `detekt`, `lint`, `koverHtmlReport`, `koverVerify`). Tasks that publish, sign or change files are not allowed automatically.
 
 #### Output styles — `.claude/output-styles/`
 - An output style is a set of instructions applied to **every response** in the session. It changes *how Claude talks and works*, not what it knows about the project.
