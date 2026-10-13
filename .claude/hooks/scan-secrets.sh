@@ -8,7 +8,8 @@
 set -uo pipefail
 
 files="$(git diff --name-only --diff-filter=ACM 2>/dev/null; git diff --cached --name-only --diff-filter=ACM 2>/dev/null)"
-files="$(printf '%s\n' "$files" | sort -u | grep -E '\.(kt|kts|java|yaml|yml|json|properties)$' || true)"
+# Source and config files, including HOCON (.conf), TOML, .env files and Dockerfiles.
+files="$(printf '%s\n' "$files" | sort -u | grep -E '(\.(kt|kts|java|yaml|yml|json|properties|conf|toml|env)|(^|/)\.env(\.[^/]*)?|(^|/)Dockerfile(\.[A-Za-z0-9_-]+)?)$' || true)"
 
 [ -z "$files" ] && exit 0
 
