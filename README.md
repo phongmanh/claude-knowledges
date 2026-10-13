@@ -33,7 +33,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
 - Plain Markdown that is added to the context of **every** session, so keep it short and high-signal: what the app is, the architecture, the build/test/lint commands, and rules that apply everywhere.
 - Loaded from several levels and merged: user (`~/.claude/CLAUDE.md`) → project (`./CLAUDE.md`) → personal (`CLAUDE.local.md`, gitignored). A `CLAUDE.md` inside a subdirectory is read when Claude works on files in that directory.
 - Other files can be pulled in with `@path/to/file.md` imports.
-- In this repo: the root `CLAUDE.md` is the entry point and indexes the other rule files.
+- In this repo: the root `CLAUDE.md` holds the overview, architecture and global rules; everything else lives in `.claude/rules/`, which Claude Code loads on its own (no index or imports needed).
 
 #### Rules — `.claude/rules/`
 - Same idea as `CLAUDE.md`, split into focused files so each one stays readable.
@@ -46,7 +46,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
   # Domain rules
   - No android.* imports ...
   ```
-- In this repo: `GUIDELINES.md` (principles), `naming.md`, `git.md`, and one file per layer (`app/`, `domain/`, `data/`). Two rules use `paths:` so they load only when needed: `testing.md` (test sources, including Kotlin Multiplatform test source sets and Ktor server tests) and `sdlc.md` (`docs/sdlc/**`, the android-sdlc, compose-multiplatform-sdlc and ktor-sdlc deliverables).
+- In this repo: `naming.md` and `git.md` load in every session. The rest use `paths:` so they load only when needed: one file per layer (`app.md` for `app/` and `feature/`, `domain.md` and `data.md` for any `domain/` or `data/` folder), `testing.md` (test sources, including Kotlin Multiplatform test source sets and Ktor server tests) and `sdlc.md` (`docs/sdlc/**`, the android-sdlc, compose-multiplatform-sdlc and ktor-sdlc deliverables).
 
 #### Skills — `.claude/skills/`
 - A folder with a `SKILL.md` (plus optional scripts, templates, reference docs). Frontmatter `name` + `description`.
