@@ -2,11 +2,11 @@
 """Claude Code PreToolUse hook (Edit|Write|MultiEdit).
 
 Blocks new production Kotlin that breaks the project's coding and
-architecture rules (.claude/rules/, the android-sdlc and
-compose-multiplatform-sdlc code patterns). Production code is src/main/ and
-the Kotlin Multiplatform source sets (src/commonMain/, src/androidMain/,
-src/iosMain/, ...). Only the text being written is checked, so existing legacy
-code is never flagged. Exit code 2 stops the tool call and shows stderr to Claude.
+architecture rules (.claude/rules/, the android-sdlc, compose-multiplatform-sdlc
+and ktor-sdlc code patterns). Production code is src/main/ and the Kotlin
+Multiplatform source sets (src/commonMain/, src/androidMain/, src/iosMain/, ...).
+Only the text being written is checked, so existing legacy code is never
+flagged. Exit code 2 stops the tool call and shows stderr to Claude.
 
 Install at: .claude/hooks/guard-kotlin-rules.py   (chmod +x)
 """
@@ -15,8 +15,8 @@ import re
 import sys
 
 RULES_HINT = (
-    ".claude/rules/ and the code-patterns.md of .claude/skills/android-sdlc "
-    "or .claude/skills/compose-multiplatform-sdlc"
+    ".claude/rules/ and the code-patterns.md of .claude/skills/android-sdlc, "
+    ".claude/skills/compose-multiplatform-sdlc or .claude/skills/ktor-sdlc"
 )
 COMMENT_PREFIXES = ("//", "/*", "*")
 PRODUCTION_SOURCE = re.compile(r"/src/(main|\w+Main)/")
@@ -35,6 +35,11 @@ def in_view_model(path, text):
     return path.endswith("ViewModel.kt")
 
 
+def in_route_file(path, text):
+    """Ktor route files: routes call services, never repositories or Exposed."""
+    return path.endswith(("Routes.kt", "Routing.kt")) or "/routes/" in path
+
+
 def outside_di_module(path, text):
     """True unless the text is a Hilt module (@Provides) or a Koin module (module { ... })."""
     return not DI_MODULE.search(text)
@@ -43,8 +48,19 @@ def outside_di_module(path, text):
 # (pattern, rule, applies_to)
 CHECKS = [
     (r"[\w)\]]!!", "No `!!`: use `?.`, `?:` or `requireNotNull(x) { \"reason\" }`.", everywhere),
-    (r"\bGlobalScope\b", "No `GlobalScope`: use viewModelScope, a suspend function or WorkManager.", everywhere),
+    (
+        r"\bGlobalScope\b",
+        "No `GlobalScope`: use viewModelScope, a suspend function or WorkManager "
+        "(`application.launch` or a queue in a Ktor service).",
+        everywhere,
+    ),
     (r"\brunBlocking\b", "No `runBlocking` in production code.", everywhere),
+    (
+        r"\bprintln\(|\.printStackTrace\(\)|\bThread\.sleep\(",
+        "No `println`, `printStackTrace()` or `Thread.sleep` in production code: "
+        "use the project's logger (SLF4J, Timber, Kermit) and `delay`.",
+        everywhere,
+    ),
     (
         r"\bText\(\s*(text\s*=\s*)?\"",
         "No hard-coded UI text: use `stringResource(R.string.…)`, or `stringResource(Res.string.…)` in Compose Multiplatform.",
@@ -52,16 +68,23 @@ CHECKS = [
     ),
     (
         r"\bDispatchers\.(IO|Default)\b",
-        "Inject dispatchers (`@IoDispatcher`/`@DefaultDispatcher`, or `AppDispatchers` in Kotlin Multiplatform) "
-        "instead of hard-coding them.",
+        "Inject dispatchers (`@IoDispatcher`/`@DefaultDispatcher`, or `AppDispatchers` in Kotlin Multiplatform "
+        "and Ktor services) instead of hard-coding them.",
         outside_di_module,
     ),
     (
-        r"^\s*import\s+(android|androidx|retrofit2|okhttp3|dagger\.hilt\.android|io\.ktor|platform)\.",
-        "The domain layer is pure Kotlin: no Android, iOS (`platform.*`), Retrofit, OkHttp, Ktor or Hilt-Android imports.",
+        r"^\s*import\s+(android|androidx|retrofit2|okhttp3|dagger\.hilt\.android|io\.ktor|platform"
+        r"|org\.jetbrains\.exposed|java\.sql|javax\.sql|com\.zaxxer\.hikari|org\.flywaydb)\.",
+        "The domain layer is pure Kotlin: no Android, iOS (`platform.*`), Retrofit, OkHttp, Ktor, Hilt-Android, "
+        "Exposed, JDBC, HikariCP or Flyway imports.",
         in_domain_layer,
     ),
     (r"\b[A-Z]\w*Repository(Impl)?\b", "ViewModels call UseCases, never repositories.", in_view_model),
+    (
+        r"\b[A-Z]\w*Repository(Impl)?\b|^\s*import\s+org\.jetbrains\.exposed\.",
+        "Routes call services; database access lives in the persistence adapter.",
+        in_route_file,
+    ),
 ]
 
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Claude Code PreToolUse hook (Edit|Write|MultiEdit).
 
-Keeps the android-sdlc phase gates real. Before Claude edits a deliverable
+Keeps the phase gates of the SDLC skills (android-sdlc,
+compose-multiplatform-sdlc, ktor-sdlc) real. Before Claude edits a deliverable
 under docs/sdlc/<slug>/ that STATUS.md marks as Approved (baselined), the user
 is asked to confirm. A baselined document should change only through an
 approved change request (cr/CR-NNN-*.md). STATUS.md, rtm.md and cr/ are
