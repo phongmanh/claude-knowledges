@@ -1,4 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew assembleDebug *)",
+      "Bash(./gradlew test *)",
+      "Bash(./gradlew ktlintCheck *)",
+      "Bash(./gradlew detekt *)",
+      "Bash(./gradlew lint *)",
+      "Bash(./gradlew koverHtmlReport *)",
+      "Bash(./gradlew koverVerify *)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -7,6 +18,19 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-prod-db.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-kotlin-rules.py"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-sdlc-baseline.py"
           }
         ]
       }
