@@ -59,6 +59,7 @@ Claude Code can be customized with several kinds of files. They differ in **when
   ---
   1. Create `<Feature>UiState` sealed interface (Loading/Success/Error) ...
   ```
+- In this repo: [`ktor-sdlc`](.claude/skills/ktor-sdlc/SKILL.md) — a phase-gated waterfall lifecycle (requirements → operations) for a Kotlin backend built with Ktor: hexagonal layers, type-safe routing, Koin, Exposed + PostgreSQL + Flyway, RFC 9457 problem details, JWT/OIDC, an OpenAPI contract checked in CI, OWASP ASVS and the API Security Top 10, `testApplication` + Testcontainers, and zero-downtime container deploys with expand/contract migrations. Its code patterns were compiled and tested against current library versions. Run `/ktor-sdlc`, or ask Claude to plan, build or deploy a Ktor service or endpoint.
 
 #### Subagents — `.claude/agents/`
 - A Markdown file with frontmatter (`name`, `description`, optional `tools`, `model`) and a system prompt in the body.
