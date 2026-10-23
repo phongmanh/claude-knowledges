@@ -126,6 +126,10 @@ internal class NoteRepositoryImpl @Inject constructor(
 }
 ```
 - Catch specific exceptions only. If you ever have to catch `Exception`, rethrow `CancellationException`.
+- **Cancellation is cooperative.**
+  - A CPU-bound loop calls `ensureActive()` so it stops with its scope.
+  - Cleanup that must finish even after cancellation runs in `withContext(NonCancellable)`.
+- **Shared mutable state** in suspend code is guarded by a `Mutex`, or held in a `MutableStateFlow` and changed with `update { }`.
 - The Json instance is configured with `ignoreUnknownKeys = true`, so newer backends don't break older apps.
 
 ## Dependency injection

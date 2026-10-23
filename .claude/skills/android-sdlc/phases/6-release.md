@@ -16,6 +16,7 @@ Ship the approved build to Google Play safely and in stages, watch it in product
    - `versionCode` only goes up; `versionName` follows the release scheme.
    - The upload key lives in CI secrets; Play App Signing holds the app signing key.
    - Archive the R8 mapping file and upload it to Play Console and the crash reporter.
+   - CI uploads to Play through the Play Developer API (e.g. Gradle Play Publisher), not by hand.
 2. **Play Console.**
    - The Data safety form matches the data inventory, including what SDKs collect.
    - Sensitive permissions (e.g. background location) are declared and justified.
@@ -34,6 +35,8 @@ Ship the approved build to Google Play safely and in stages, watch it in product
    3. Ship a fix forward. A store release can't be rolled back.
 5. **Safety nets.**
    - Remote config for the feature flags and kill switches.
+   - Each flag has a safe default for when remote config can't load, an owner and a removal date. Remove flags after launch: they are tech debt.
+   - Test each kill switch on the release build before the rollout starts.
    - A minimum-supported-version check that prompts a forced update through In-App Updates.
 6. **Hypercare** (e.g. 1–2 weeks).
    - Review Android vitals, crash reports, store reviews and support tickets every day.

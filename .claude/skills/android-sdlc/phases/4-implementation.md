@@ -59,6 +59,7 @@ Cheapest checks first. Any failure blocks the merge.
 5. A dependency vulnerability scan and a secrets scan
 6. On merge or nightly:
    - instrumented and screenshot tests;
+   - Macrobenchmark for startup and the key scrolls, on a physical device or a device farm. Compare each result with its NFR budget and the last `main` run. Fail or flag the build when a budget is broken or a result regresses beyond an agreed margin (e.g. 10%);
    - distribute the build to testers (e.g. the Play internal track or Firebase App Distribution).
 
 ### Pull requests
@@ -71,6 +72,9 @@ Cheapest checks first. Any failure blocks the merge.
   - what changed and why, with the FR IDs;
   - screenshots in light, dark and large font for UI changes.
 - **Deviations** from the approved design or contract need a CR, not just a PR comment.
+- **The owner's code review mode** (STATUS.md):
+  - *Approve before writing:* present each PR's files, every line, with a plain explanation of what each part does and why. Write the code only after approval, then run the checks.
+  - *Review after writing:* open the PR, then walk the owner through it before merging.
 
 ### Definition of Done (per PR)
 - Code follows the patterns.

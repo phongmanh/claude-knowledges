@@ -50,12 +50,20 @@ A small feature may combine G2 and G3 into one review. **G5 is never skipped or 
 
 ## How Claude runs this workflow
 1. **Workspace.** In the target project, open `docs/sdlc/<initiative-slug>/STATUS.md`. If it exists, resume at the phase it records. If not, create it from [templates/status.md](templates/status.md).
-2. **Facts.** In an existing Android project, read `settings.gradle.kts`, `gradle/libs.versions.toml`, the module `build.gradle.kts` files, `CLAUDE.md` and `.claude/rules/`. Record the modules, `minSdk`/`targetSdk`/`compileSdk` and the stack in STATUS.md. Don't contradict them without an ADR.
+2. **Facts.**
+   - In an existing Android project, read `settings.gradle.kts`, `gradle/libs.versions.toml`, the module `build.gradle.kts` files, `CLAUDE.md` and `.claude/rules/`. Record the modules, `minSdk`/`targetSdk`/`compileSdk` and the stack in STATUS.md. Don't contradict them without an ADR.
+   - When a backend, an API contract or a design already exists, read them as inputs:
+     - the contract (e.g. OpenAPI);
+     - the backend's own requirements, and the rules it sets for clients (headers, retries, polling, minimum app versions);
+     - every screen of the design.
+
+     Record each source in STATUS.md. Cite upstream IDs with a prefix (e.g. `BE-FR-003`), so they don't clash with the app's own, and fill the RTM's **Upstream source** column.
 3. **Scope.** Confirm with the user:
    - new app or feature;
    - target users and devices;
    - compliance (e.g. GDPR, COPPA, HIPAA) and the MASVS level;
-   - existing documents to reuse.
+   - existing documents to reuse;
+   - how the owner reviews code in Phase 4: approve each PR's code before it's written, or review each PR after it's written.
 
    Record the answers and pick the tailoring column.
 4. **Load only what's needed:** the current phase file and the references its **Load** line lists. If STATUS.md doesn't show the previous gate as approved, stop and say so.
@@ -63,6 +71,7 @@ A small feature may combine G2 and G3 into one review. **G5 is never skipped or 
    - Mark unknowns `TBD-<n>` and assumptions `ASSUMPTION:`, and list them in STATUS.md.
    - Ask the user for what only stakeholders can decide: targets, priorities, approvers.
    - Never invent requirements, numbers, approvals or sign-offs.
+   - Mark any number Claude suggests (an NFR target, a limit) as **(proposed)**. Confirming those numbers is a TBD that blocks G1.
 6. **Trace.** Add every new requirement, design element and test to `rtm.md`.
 7. **Gate review.** Run the phase's exit checklist. Present the deliverables and their status, the checklist results, open TBDs, top risks, and a recommendation: approve, approve with conditions, or rework.
 8. **STOP for sign-off.** Ask for the decision and the approver's name and role. Record both in the STATUS.md gate log and suggest a git tag (`sdlc/<slug>/G<n>`). A waiver records the accepted risk and who accepted it.
@@ -81,7 +90,8 @@ docs/sdlc/<initiative-slug>/
 ├── design/<feature>.md     # Phase 3
 ├── test-plan.md            # Phases 1–5 (+ test summary report)
 ├── release-checklist.md    # Phase 6
-└── cr/CR-NNN-<title>.md    # after any baseline
+├── cr/CR-NNN-<title>.md    # after any baseline
+└── postmortem/PM-NNN-<title>.md  # Phase 7, after each S1 incident
 ```
 
 ## File index
@@ -90,7 +100,7 @@ docs/sdlc/<initiative-slug>/
   - [architecture](reference/architecture.md): layers, module layouts, default stack, Gradle, DI, error model;
   - [code patterns](reference/code-patterns.md): canonical Kotlin for each layer;
   - [UI/UX](reference/ui-ux.md) · [security & privacy](reference/security-privacy.md) · [performance & reliability](reference/performance-reliability.md) · [testing](reference/testing.md) · [review checklist](reference/review-checklist.md).
-- **Templates:** [status](templates/status.md) · [requirements](templates/requirements.md) · [architecture](templates/architecture.md) · [adr](templates/adr.md) · [feature-design](templates/feature-design.md) · [test-plan](templates/test-plan.md) · [release-checklist](templates/release-checklist.md) · [change-request](templates/change-request.md) · [rtm](templates/rtm.md)
+- **Templates:** [status](templates/status.md) · [requirements](templates/requirements.md) · [architecture](templates/architecture.md) · [adr](templates/adr.md) · [feature-design](templates/feature-design.md) · [test-plan](templates/test-plan.md) · [release-checklist](templates/release-checklist.md) · [change-request](templates/change-request.md) · [rtm](templates/rtm.md) · [postmortem](templates/postmortem.md)
 
 ## Conventions
 - **Requirement IDs.** `FR-nnn` for functional requirements. `NFR-<ATTR>-nn` for non-functional ones, where ATTR is one of PERF, REL, SEC, PRIV, A11Y, MAINT, TEST, COMPAT, OBS, I18N, SIZE.

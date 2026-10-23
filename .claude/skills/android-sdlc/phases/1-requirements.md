@@ -55,7 +55,7 @@ Agree on what the app must do and how well, in terms a tester can verify. No des
 
 ## Exit checklist (G1)
 - [ ] Every requirement has an ID, a priority and testable acceptance criteria
-- [ ] Every NFR has a number, a condition and a verification method
+- [ ] Every NFR has a number, a condition and a verification method; no number is still marked "(proposed)"
 - [ ] Permissions and data inventories complete; MASVS level chosen
 - [ ] `minSdk`, form factors and locales agreed
 - [ ] No open TBD blocks a Must requirement

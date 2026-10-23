@@ -14,6 +14,8 @@
 | Security level | MASVS-L1 / L2 (+R) |
 | Compliance | e.g. GDPR, COPPA, Google Play policies |
 | Product owner / Tech lead | <name, role> / <name, role> |
+| Inputs | e.g. backend contract `<repo>/docs/api/openapi.yaml` v<x>, design `<link>` (or "none") |
+| Code review mode | Approve before writing / Review after writing (each PR) |
 | Current phase | 1 Requirements |
 | Tailoring | Full (app) / Light (feature) |
 | Last updated | YYYY-MM-DD |

@@ -32,7 +32,8 @@ Feature design → tests (do they describe the right behaviour?) → domain → 
 
 **Coroutines and Flow**
 - [ ] No `GlobalScope`, `runBlocking` or hard-coded `Dispatchers` in production code
-- [ ] `CancellationException` never swallowed; work is cancelled with its scope
+- [ ] `CancellationException` never swallowed; work is cancelled with its scope; CPU loops call `ensureActive()`
+- [ ] Shared mutable state guarded by a `Mutex` or `MutableStateFlow.update`; cleanup after cancellation in `NonCancellable`
 - [ ] `StateFlow` exposed read-only and built with `stateIn(… WhileSubscribed …)`; the UI collects with `collectAsStateWithLifecycle`
 
 **Compose UI**

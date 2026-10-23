@@ -31,6 +31,7 @@ Choose the level in Phase 1 and verify it in Phase 5.
 - **Tokens.**
   - Short-lived access tokens with refresh-token rotation.
   - An OkHttp `Authenticator` refreshes once, and signs the user out if that fails.
+  - The refresh is single-flight: when many calls get `401` at once, one refresh runs and the rest wait for it. A call whose token was already replaced retries with the new token instead of refreshing again.
 - **Biometrics:** `BiometricPrompt` with a `CryptoObject` bound to a Keystore key, not just a success callback (L2).
 - **Authorization** is enforced on the server. The client only hides UI.
 
@@ -38,7 +39,8 @@ Choose the level in Phase 1 and verify it in Phase 5.
 - **HTTPS only.**
   - `network_security_config.xml` sets `cleartextTrafficPermitted="false"`.
   - No custom `TrustManager` or `HostnameVerifier` that accepts everything.
-- **Certificate pinning** only when the threat model needs it (L2), and then with a backup pin and a rotation plan.
+- **User-installed CAs** aren't trusted (the default since API 24). Allow them only under `<debug-overrides>`, so QA can inspect traffic with a proxy on debug builds.
+- **Certificate pinning** only when the threat model needs it (L2). Then use a backup pin, an `expiration` date on the pin set, a rotation plan, and a remote switch to turn pinning off, so a server certificate change can't lock every user out.
 - **Requests:** set OkHttp timeouts. Keep sensitive data out of URLs, because query strings end up in logs.
 
 ## MASVS-PLATFORM
@@ -63,6 +65,8 @@ Choose the level in Phase 1 and verify it in Phase 5.
 
 ## MASVS-RESILIENCE (R)
 - **Play Integrity API.** Request a verdict for sensitive actions, and **verify it on the server**.
+  - Standard requests (prepared once, then fast) suit frequent checks; classic requests suit rare, high-value actions.
+  - Some real users fail the checks. Step up or limit the risky action, rather than blocking the whole app.
 - **Root and tamper detection,** and obfuscation beyond R8, only when the threat model justifies them. They never replace server-side checks.
 
 ## Privacy
